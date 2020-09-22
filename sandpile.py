@@ -2,8 +2,6 @@
 import numpy as np
 from numpy import zeros, ones, product
 from numpy.random import randint
-import numpy as np
-from numpy import zeros, ones
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")

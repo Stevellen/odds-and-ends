@@ -74,7 +74,6 @@ class Sandpile:
     @staticmethod
     def watch_sand(shape=(3,3), max_height=3, iterations=100):
         pile = Sandpile.drip(shape, max_height)
-        print(pile)
         for _ in range(iterations):
             plt.xticks([])
             plt.yticks([])

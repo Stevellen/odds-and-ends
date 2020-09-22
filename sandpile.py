@@ -9,12 +9,12 @@ warnings.filterwarnings("ignore")
 
 # %%
 class Sandpile:
-    def __init__(self, points=None, shape=(3,3), max_height=3):
+    def __init__(self, points=None, shape=(3,3), max_height=3, dtype=np.int32):
         self.shape = shape
         self.max_height = max_height
-        self.dtype = np.int32
+        self.dtype = dtype
         if points is None:
-            self.value = np.random.randint(0,4, shape)
+            self.value = np.random.randint(0, self.max_height, shape)
         else:
             self.value = np.array(points).reshape(*shape)
             
@@ -22,12 +22,13 @@ class Sandpile:
     @staticmethod
     def drip(shape=(3,3), dtype=np.int32):
         dim = shape[0] // 2
-        drop = np.zeros(shape, dtype=dtype)
+        drop = zeros(shape, dtype=dtype)
         drop[dim,dim] = 1
         return Sandpile(drop, shape)
     
     def drip_(self):
-        return self.drip(self.shape)
+        self.value = self.value + self.drip(self.shape)
+        return self
         
     @staticmethod
     def zeros(shape=(3,3), n=1, dtype=np.int32):
@@ -36,14 +37,17 @@ class Sandpile:
         else:
             return [Sandpile(zeros(shape, dtype=dtype), shape) for _ in range(n)]
 
+    def zeros_(self):
+        self.value = zeros(self.shape, dtype=self.dtype)
+
     def clean_(self):
         self.value = zeros(self.shape)
         return self
     
     @staticmethod
-    def ones(shape=(3,3), n=1, dtype=np.int32):
+    def ones(shape=(3,3), n=1, max_height=3, dtype=np.int32):
         if n == 1:
-            return Sandpile(ones(shape, dtype=dtype), shape)
+            return Sandpile(ones(shape, dtype=dtype), shape, max_height, dtype=dtype)
         else:
             return [Sandpile(ones(shape, dtype=dtype), shape) for _ in range(n)]
     
@@ -64,13 +68,13 @@ class Sandpile:
         return other + other_other
     
     def sneeze_(self):
-        self.value = randint(0, 4, self.shape)
+        self.value = randint(0, self.max_height, self.shape)
         return self
     
     @staticmethod
-    def watch_sand(pile=None, shape=(3,3), iterations=100):
+    def watch_sand(pile=None, shape=(3,3), max_height=3, iterations=100):
         if not isinstance(pile, Sandpile):
-            pile = Sandpile.zeros(shape)
+            pile = Sandpile(shape=shape, max_height=max_height).zeros_()
         for _ in range(iterations):
             plt.xticks([])
             plt.yticks([])

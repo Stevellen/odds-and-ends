@@ -3,6 +3,8 @@ import numpy as np
 from numpy import zeros, ones, product
 from numpy.random import randint
 import matplotlib.pyplot as plt
+from matplotlib.colors import ListedColormap
+import matplotlib.animation as animation
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -13,6 +15,7 @@ class Sandpile:
         self.shape = shape
         self.max_height = max_height
         self.dtype = dtype
+        self.cmap = ListedColormap(['white', 'green', 'purple', 'yellow'])
         if points is None:
             self.value = np.random.randint(0, self.max_height, shape)
         else:
@@ -27,15 +30,15 @@ class Sandpile:
         return Sandpile(drop, shape=shape, max_height=max_height, dtype=np.int32)
     
     def drip_(self):
-        self.value = self.value + self.drip(self.shape)
+        self.value = (self + self.drip(self.shape)).value
         return self
         
     @staticmethod
-    def zeros(shape=(3,3), n=1, dtype=np.int32):
+    def zeros(shape=(3,3), max_height=3, n=1, dtype=np.int32):
         if n == 1:
-            return Sandpile(zeros(shape), shape)
+            return Sandpile(zeros(shape), shape, max_height)
         else:
-            return [Sandpile(zeros(shape, dtype=dtype), shape) for _ in range(n)]
+            return [Sandpile(zeros(shape), shape, max_height) for _ in range(n)]
 
     def zeros_(self):
         self.value = zeros(self.shape, dtype=self.dtype)
@@ -56,37 +59,45 @@ class Sandpile:
         return self
     
     @staticmethod
-    def pour(shape=(3,3), pours=1, max_height=3):
-        sand = [Sandpile(randint(0,4, shape), shape, max_height) for _ in range(pours)]
+    def pour(shape=(3,3), max_height=3, pours=1):
+        sand = [Sandpile(randint(0, max_height, shape), shape, max_height) for _ in range(pours)]
         if len(sand) == 1:
             sand = sand[0]
         return sand
     
-    def add(self, other, other_other=None):
-        if other_other is None:
-            return self + other
-        return other + other_other
+    def add_(self, other):
+        self.value = (self + other).value
+        return self
     
     def sneeze_(self):
         self.value = randint(0, self.max_height, self.shape)
         return self
     
-    @staticmethod
-    def watch_sand(shape=(3,3), max_height=3, iterations=100):
-        pile = Sandpile.drip(shape, max_height)
+    def watch_sand(self, drop, iterations=100, save=False):
+        images = []
+        fig = plt.figure(figsize=(10,10))
+        plt.xticks([])
+        plt.yticks([])
+        
         for _ in range(iterations):
-            plt.xticks([])
-            plt.yticks([])
-            plt.imshow(pile.value)
-            pile = pile.add(pile.drip(shape))
-            plt.pause(0.1)
-        plt.show()
+            im = plt.imshow(self.value, cmap=self.cmap, animated=True)
+            images.append([im])
+            self.add_(drop)
+        
+        Writer = animation.writers['ffmpeg']
+        writer = Writer(fps=10, metadata=dict(artist='Me'), bitrate=1800)
+        
+        ani = animation.ArtistAnimation(fig, images, interval=100, blit=True, repeat_delay=500)
+        if save:
+            ani.save('sandpile.mp4', writer=writer)
+        else:
+            plt.show()
     
     def fetch(self, idx):
         return self.value[idx]
     
     def show(self):
-        plt.imshow(self.value)
+        plt.imshow(self.value, cmap=self.cmap, norm=self.norm)
         plt.xticks([])
         plt.yticks([])
         plt.tight_layout()
@@ -118,7 +129,7 @@ class Sandpile:
                     res[r,c] -= height+1
                     neighbors = self.__get_neighbors(r,c)
                     res[neighbors] += 1
-        return Sandpile(res.astype(np.int32).flatten(), self.shape)
+        return Sandpile(res.astype(np.int32), self.shape, self.max_height)
     
     def __repr__(self):
         return repr(self.value)

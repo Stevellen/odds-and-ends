@@ -1,2 +1,6 @@
 .spyproject/
 oddity-env/
+test.*
+tmp.*
+__pycache__/*
+*.mp4

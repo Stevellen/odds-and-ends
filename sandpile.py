@@ -20,11 +20,11 @@ class Sandpile:
             
             
     @staticmethod
-    def drip(shape=(3,3), dtype=np.int32):
+    def drip(shape=(3,3), max_height=3, dtype=np.int32):
         dim = shape[0] // 2
         drop = zeros(shape, dtype=dtype)
         drop[dim,dim] = 1
-        return Sandpile(drop, shape)
+        return Sandpile(drop, shape=shape, max_height=max_height, dtype=np.int32)
     
     def drip_(self):
         self.value = self.value + self.drip(self.shape)
@@ -72,9 +72,9 @@ class Sandpile:
         return self
     
     @staticmethod
-    def watch_sand(pile=None, shape=(3,3), max_height=3, iterations=100):
-        if not isinstance(pile, Sandpile):
-            pile = Sandpile(shape=shape, max_height=max_height).zeros_()
+    def watch_sand(shape=(3,3), max_height=3, iterations=100):
+        pile = Sandpile.drip(shape, max_height)
+        print(pile)
         for _ in range(iterations):
             plt.xticks([])
             plt.yticks([])
@@ -85,6 +85,13 @@ class Sandpile:
     
     def fetch(self, idx):
         return self.value[idx]
+    
+    def show(self):
+        plt.imshow(self.value)
+        plt.xticks([])
+        plt.yticks([])
+        plt.tight_layout()
+        plt.show()
         
     def __get_neighbors(self, row, col):
         # return bottom, left, top, right in form [row, column]

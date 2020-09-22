@@ -121,6 +121,7 @@ class Sandpile:
         assert isinstance(other, type(self)), \
             f"Cannot add sandpile and {type(other)}"
         res = self.value + other.value
+        return self.__propagate(res)
     
     def __getitem__(self, idx):
         return self.value[idx]

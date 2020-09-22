@@ -1,2 +1,4 @@
-numpy
-matplotlib
+matplotlib 
+spyder
+spyder-kernels 
+spyder-terminal

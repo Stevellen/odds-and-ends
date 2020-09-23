@@ -39,14 +39,20 @@ class Sandpile:
         
     @staticmethod
     def Y(size, max_height=3):
-        pour = x_cross(size)
+        fill_diagonal(pour := zeros((size,size)), 2)
+        fill_diagonal(pour2 := zeros((size,size)), 2)
+        pour = pour + np.fliplr(pour2)
+        pour[size//2,size//2] = 2
         pour[size//2:,:] = 0
         pour [size//2:, size//2] = 2
         return Sandpile(pour, pour.size, max_height)
         
     @staticmethod
     def peace(size, max_height=3):
-        pour = x_cross(size)
+        fill_diagonal(pour := zeros((size,size)), 2)
+        fill_diagonal(pour2 := zeros((size,size)), 2)
+        pour = pour + np.fliplr(pour2)
+        pour[size//2,size//2] = 2
         pour[:size//2,:] = 0
         pour [:size//2, size//2] = 2
         return Sandpile(pour, pour.size, max_height)
@@ -54,11 +60,11 @@ class Sandpile:
             
             
     @staticmethod
-    def drip(shape=(3,3), max_height=3, dtype=np.int32):
-        dim = shape[0] // 2
-        drop = zeros(shape, dtype=dtype)
+    def drip(size, max_height=3):
+        dim = shape // 2
+        drop = zeros((size,size))
         drop[dim,dim] = 1
-        return Sandpile(drop, shape=shape, max_height=max_height, dtype=np.int32)
+        return Sandpile(drop, shape=drop.shape, max_height=max_height)
     
     def drip_(self):
         self.value = (self + self.drip(self.shape)).value

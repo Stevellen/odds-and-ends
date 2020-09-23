@@ -1,6 +1,6 @@
 # %%
 import numpy as np
-from numpy import zeros, ones, product
+from numpy import zeros, ones, product, fill_diagonal
 from numpy.random import randint
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
@@ -17,9 +17,40 @@ class Sandpile:
         self.dtype = dtype
         self.cmap = ListedColormap(['white', 'green', 'purple', 'yellow'])
         if points is None:
-            self.value = np.random.randint(0, self.max_height, shape)
+            self.value = zeros(self.shape)
         else:
             self.value = np.array(points).reshape(*shape)
+
+
+    # Some templates
+    @staticmethod
+    def x_cross(size, max_height=3):
+        fill_diagonal(pour := zeros((size,size)), 2)
+        fill_diagonal(pour2 := zeros((size,size)), 2)
+        pour = pour + np.fliplr(pour2)
+        pour[size//2,size//2] = 2
+        return Sandpile(pour, pour.size, max_height)
+        
+    @staticmethod
+    def t_cross(size, max_height=3):
+        pour = np.zeros((size,size))
+        pour[:, size//2] = pour[0, :] = 2
+        return Sandpile(pour, pour.size, max_height)
+        
+    @staticmethod
+    def Y(size, max_height=3):
+        pour = x_cross(size)
+        pour[size//2:,:] = 0
+        pour [size//2:, size//2] = 2
+        return Sandpile(pour, pour.size, max_height)
+        
+    @staticmethod
+    def peace(size, max_height=3):
+        pour = x_cross(size)
+        pour[:size//2,:] = 0
+        pour [:size//2, size//2] = 2
+        return Sandpile(pour, pour.size, max_height)
+        
             
             
     @staticmethod
@@ -73,7 +104,7 @@ class Sandpile:
         self.value = randint(0, self.max_height, self.shape)
         return self
     
-    def watch_sand(self, drop, iterations=100, save=False):
+    def watch_sand(self, drop, iterations=100, save=False, save_to=None):
         images = []
         fig = plt.figure(figsize=(10,10))
         plt.xticks([])
@@ -89,7 +120,7 @@ class Sandpile:
         
         ani = animation.ArtistAnimation(fig, images, interval=100, blit=True, repeat_delay=500)
         if save:
-            ani.save('sandpile.mp4', writer=writer)
+            ani.save(save_to, writer=writer)
         else:
             plt.show()
     
@@ -97,7 +128,7 @@ class Sandpile:
         return self.value[idx]
     
     def show(self):
-        plt.imshow(self.value, cmap=self.cmap, norm=self.norm)
+        plt.imshow(self.value, cmap=self.cmap)
         plt.xticks([])
         plt.yticks([])
         plt.tight_layout()
@@ -132,6 +163,7 @@ class Sandpile:
         return Sandpile(res.astype(np.int32), self.shape, self.max_height)
     
     def __repr__(self):
+        """Prints the """
         return repr(self.value)
     
     def __add__(self, other):

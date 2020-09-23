@@ -4,3 +4,5 @@ test.*
 tmp.*
 __pycache__/*
 *.mp4
+oddworld/
+.vscode/

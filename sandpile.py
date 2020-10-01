@@ -1,4 +1,5 @@
 # %%
+from copy import deepcopy
 import numpy as np
 from numpy import zeros, ones, product, fill_diagonal
 from numpy.random import randint
@@ -15,9 +16,9 @@ class Sandpile:
         self.shape = shape
         self.max_height = max_height
         self.dtype = dtype
-        self.cmap = ListedColormap(['white', 'green', 'purple', 'yellow'])
+        self.cmap = ListedColormap(['white', 'blue', 'green', 'gold'])
         if points is None:
-            self.value = zeros(self.shape)
+            self.value = randint(0,max_height, self.shape)
         else:
             self.value = np.array(points).reshape(*shape)
 
@@ -61,7 +62,7 @@ class Sandpile:
             
     @staticmethod
     def drip(size, max_height=3):
-        dim = shape // 2
+        dim = size // 2
         drop = zeros((size,size))
         drop[dim,dim] = 1
         return Sandpile(drop, shape=drop.shape, max_height=max_height)
@@ -84,23 +85,19 @@ class Sandpile:
         self.value = zeros(self.shape)
         return self
     
+    def copy(self):
+        return deepcopy(self)
+    
     @staticmethod
     def ones(shape=(3,3), n=1, max_height=3, dtype=np.int32):
         if n == 1:
-            return Sandpile(ones(shape, dtype=dtype), shape, max_height, dtype=dtype)
+            return Sandpile(ones((shape), dtype=dtype), shape, max_height, dtype=dtype)
         else:
             return [Sandpile(ones(shape, dtype=dtype), shape) for _ in range(n)]
     
     def ones_(self):
         self.value = ones(self.shape, dtype=self.dtype)
         return self
-    
-    @staticmethod
-    def pour(shape=(3,3), max_height=3, pours=1):
-        sand = [Sandpile(randint(0, max_height, shape), shape, max_height) for _ in range(pours)]
-        if len(sand) == 1:
-            sand = sand[0]
-        return sand
     
     def add_(self, other):
         self.value = (self + other).value
@@ -110,13 +107,13 @@ class Sandpile:
         self.value = randint(0, self.max_height, self.shape)
         return self
     
-    def watch_sand(self, drop, iterations=100, save=False, save_to=None):
+    def watch_sand(self, drop, figsize=(11,11), iterations=100, save=False, save_to=None):
         images = []
-        fig = plt.figure(figsize=(10,10))
+        fig = plt.figure(figsize=figsize)
         plt.xticks([])
         plt.yticks([])
         
-        for _ in range(iterations):
+        for i in range(iterations):
             im = plt.imshow(self.value, cmap=self.cmap, animated=True)
             images.append([im])
             self.add_(drop)
@@ -126,12 +123,9 @@ class Sandpile:
         
         ani = animation.ArtistAnimation(fig, images, interval=100, blit=True, repeat_delay=500)
         if save:
-            ani.save(save_to, writer=writer)
+            ani.save(save_to, writer=writer, dpi=200)
         else:
             plt.show()
-    
-    def fetch(self, idx):
-        return self.value[idx]
     
     def show(self):
         plt.imshow(self.value, cmap=self.cmap)
@@ -165,12 +159,16 @@ class Sandpile:
                 if val > height:
                     res[r,c] -= height+1
                     neighbors = self.__get_neighbors(r,c)
-                    res[neighbors] += 1
+                    res[neighbors] += (self.max_height // 4) + 1
         return Sandpile(res.astype(np.int32), self.shape, self.max_height)
     
+    ############################## DUNDER METHODS ################################
     def __repr__(self):
-        """Prints the """
+        """Prints the sandpiles value in the style of numpy arrays"""
         return repr(self.value)
+    
+    def __getitem__(self, idx):
+        return self.value[idx]    
     
     def __add__(self, other):
         assert isinstance(other, type(self)), \
@@ -178,26 +176,3 @@ class Sandpile:
         res = self.value + other.value
         return self.__propagate(res)
     
-    def __getitem__(self, idx):
-        return self.value[idx]
-    
-    def __setitem__(self, idx, val):
-        self.value[idx] = val
-        return self
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-            

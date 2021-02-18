@@ -30,13 +30,13 @@ class Sandpile:
         fill_diagonal(pour2 := zeros((size,size)), 2)
         pour = pour + np.fliplr(pour2)
         pour[size//2,size//2] = 2
-        return Sandpile(pour, pour.size, max_height)
+        return Sandpile(pour, pour.shape, max_height)
         
     @staticmethod
     def t_cross(size, max_height=3):
         pour = np.zeros((size,size))
         pour[:, size//2] = pour[0, :] = 2
-        return Sandpile(pour, pour.size, max_height)
+        return Sandpile(pour, pour.shape, max_height)
         
     @staticmethod
     def Y(size, max_height=3):
@@ -46,7 +46,7 @@ class Sandpile:
         pour[size//2,size//2] = 2
         pour[size//2:,:] = 0
         pour [size//2:, size//2] = 2
-        return Sandpile(pour, pour.size, max_height)
+        return Sandpile(pour, pour.shape, max_height)
         
     @staticmethod
     def peace(size, max_height=3):
@@ -57,9 +57,7 @@ class Sandpile:
         pour[:size//2,:] = 0
         pour [:size//2, size//2] = 2
         return Sandpile(pour, pour.size, max_height)
-        
-            
-            
+          
     @staticmethod
     def drip(size, max_height=3):
         dim = size // 2

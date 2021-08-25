@@ -113,37 +113,37 @@ class Sandpile {
             std::vector<std::vector<int>> sum(m_length, std::vector<int>(m_width, 0));
 
             // iterate over vectors and add up values
-            for(int i = 0; i < m_length; ++i) {
-                for(int j = 0; j < m_width; j++) {
-                    sum[i][j] = other.m_value[i][j] + m_value[i][j];
-                    if(sum[i][j] >= 4) hasPile = true;
+            for(int ii = 0; ii < m_length; ++ii) {
+                for(int jj = 0; jj < m_width; jj++) {
+                    sum[ii][jj] = other.m_value[ii][jj] + m_value[ii][jj];
+                    if(sum[ii][jj] >= 4) hasPile = true;
                 }
             }
             
             while(hasPile) { // while there are piles, iterate and topple
                 hasPile = false;
                 // now perform update on sum for max height
-                for(int i = 0; i < m_length; ++i) {
-                    for(int j = 0; j < m_width; j++) {
-                        if(sum[i][j] >= 4) {
-                            sum[i][j] -= 4;
-                            if(i-1 >= 0) { // check index of cell above
-                                sum[i-1][j] += 1;
-                                if (sum[i-1][j] >= 4) hasPile = true;
+                for(int ii = 0; ii < m_length; ++ii) {
+                    for(int jj = 0; jj < m_width; jj++) {
+                        if(sum[ii][jj] >= 4) {
+                            sum[ii][jj] -= 4;
+                            if(ii-1 >= 0) { // check index of cell above
+                                sum[ii-1][jj] += 1;
+                                if (sum[ii-1][jj] >= 4) hasPile = true;
                             }
-                            if(i+1 <= m_length-1) { // check index of cell below
-                                sum[i+1][j] += 1;
-                                if (sum[i+1][j] >= 4) hasPile = true;
-                            }
-                            
-                            if(j-1 >= 0) { // check index of cell to the left
-                                sum[i][j-1] += 1;
-                                if (sum[i][j-1] >= 4) hasPile = true;
+                            if(ii+1 <= m_length-1) { // check index of cell below
+                                sum[ii+1][jj] += 1;
+                                if (sum[ii+1][jj] >= 4) hasPile = true;
                             }
                             
-                            if(j+1 <= m_width-1) { // check index of cell to the right
-                                sum[i][j+1] += 1;
-                                if (sum[i][j+1] >= 4) hasPile = true;
+                            if(jj-1 >= 0) { // check index of cell to the left
+                                sum[ii][jj-1] += 1;
+                                if (sum[ii][jj-1] >= 4) hasPile = true;
+                            }
+                            
+                            if(jj+1 <= m_width-1) { // check index of cell to the right
+                                sum[ii][jj+1] += 1;
+                                if (sum[ii][jj+1] >= 4) hasPile = true;
                             }
                         }
                     }
@@ -163,13 +163,9 @@ class Sandpile {
 };
 const std::map<int, std::string> Sandpile::pm_charmap = Sandpile::createMap();
 
-void clear_frame() {
-    static const HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    COORD topLeft = { 0, 0 };
-    SetConsoleCursorPosition(hOut, topLeft);
-}
 
 int main(int argc, const char** argv) {
-    Sandpile::animate(60, 60, 250, "x");
+    // Basic animation demo
+    Sandpile::animate(64, 64, 250, "x");
     return 0;
 }

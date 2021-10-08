@@ -31,8 +31,8 @@ class Sandpile {
         static std::map<int, std::string> createMap() {
             std::map<int, std::string> m;
             m[0] = ".";
-            m[1] = "o";
-            m[2] = "O";
+            m[1] = "-";
+            m[2] = "+";
             m[3] = "0";
             return m;
         }
@@ -166,6 +166,6 @@ const std::map<int, std::string> Sandpile::pm_charmap = Sandpile::createMap();
 
 int main(int argc, const char** argv) {
     // Basic animation demo
-    Sandpile::animate(64, 64, 250, "x");
+    Sandpile::animate(80, 120, 300, "plus");
     return 0;
 }
